@@ -11,6 +11,7 @@
 
         <div class="vc-container d-flex flex-column justify-end align-center">
           <video class="flex-grow-1" ref="video" autoplay></video>
+          <img  class="d-none flex-grow-1" alt="" ref="image" />
           <div class="buttons">
             <v-btn  
               @click="camera=!camera"
@@ -24,11 +25,12 @@
               color="primary"
               large
               elevation="0"
+              @click="captureImage"
 
             ><v-icon>mdi-camera</v-icon></v-btn>
 
                         <v-btn  
-              @click="camera=!camera"
+              @click="closeCamera"
               fab
               elevation="0"
               small
@@ -53,11 +55,16 @@ export default {
 
   data: () => ({
     camera: false,
-    imageCapture: null
+    imageCapture: null,
+    images: []
   }),
   methods: {
     openCamera(){
       navigator.mediaDevices.getUserMedia({video: true}).then(mediaStream => {
+
+        this.$refs.video.classList.remove('d-none');
+        this.$refs.image.classList.add('d-none');
+
 
         this.$refs.video.srcObject = mediaStream
 
@@ -68,7 +75,17 @@ export default {
       this.camera=true   
     },
     closeCamera(){
-
+      this.camera=false
+    },
+    captureImage(){
+      this.imageCapture.takePhoto().then((blob) => {
+          console.log('Took photo:', blob);
+          this.$refs.image.classList.remove('d-none');
+          this.$refs.video.classList.add('d-none');
+          this.$refs.image.src = URL.createObjectURL(blob);
+        }).catch(function(error) {
+          console.log('takePhoto() error: ', error);
+        });      
     }
 
   },
