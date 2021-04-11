@@ -7,37 +7,50 @@
       overlay-color="black"
       fullscreen 
       class="d-flex flex-column"
+      fixed
       >
 
-        <div class="vc-container d-flex flex-column justify-end align-center">
+        <div class="vc-container d-flex flex-column justify-start align-center">
           <video class="flex-grow-1" ref="video" autoplay></video>
           <img  class="d-none flex-grow-1" alt="" ref="image" />
-          <div class="buttons">
-            <v-btn  
-              @click="camera=!camera"
-              fab
-              elevation="0"
-              small
-            ><v-icon>mdi-camera-switch-outline</v-icon></v-btn>
 
-            <v-btn  
-              fab
-              color="primary"
-              large
-              elevation="0"
-              @click="captureImage"
-
-            ><v-icon>mdi-camera</v-icon></v-btn>
-
-                        <v-btn  
-              @click="closeCamera"
-              fab
-              elevation="0"
-              small
-            ><v-icon>mdi-close</v-icon></v-btn>
-
-          </div>
         </div>
+
+        <v-footer 
+        class="buttons"
+        fixed
+        dark>
+            <v-row
+              justify="space-around"
+              align="center"
+              no-gutters
+            >
+              <v-btn  
+                @click="camera=!camera"
+                fab
+                elevation="0"
+                small
+              ><v-icon>mdi-camera-switch-outline</v-icon></v-btn>
+
+              <v-btn  
+                fab
+                color="primary"
+                large
+                elevation="0"
+                @click="captureImage"
+
+              ><v-icon>mdi-camera</v-icon></v-btn>
+
+                          <v-btn  
+                @click="closeCamera"
+                fab
+                elevation="0"
+                small
+              ><v-icon>mdi-close</v-icon></v-btn>
+
+            </v-row>
+
+          </v-footer>
 
         <!--  -->
 
@@ -59,7 +72,16 @@ export default {
     images: []
   }),
   methods: {
-    openCamera(){
+    async openCamera(){
+
+
+      // TODO - Force fullscreen so we can lock the app in portrait mode
+      try {
+        await screen.orientation.lock('portrait')
+      } catch (error) {
+        console.log('Could not lock device orientation: ', error)
+      }
+
       navigator.mediaDevices.getUserMedia({video: true}).then(mediaStream => {
 
         this.$refs.video.classList.remove('d-none');
@@ -99,6 +121,12 @@ export default {
 
 
 <style>
+html, body, .v-application, .v-application--wrap {
+  min-height: initial !important;
+  height: 100% !important;
+  
+}
+html { overflow-y: auto !important }
 .v-main__wrap{
   display: flex;
   justify-content: center;
@@ -106,7 +134,7 @@ export default {
 }
 
 .vc-container {
-  height: 100vh;
+  height: 100%;
 }
 
 .vc-container .buttons {
@@ -120,6 +148,12 @@ export default {
 
 .vc-container video {
   background-color: black;
+}
+
+.vc-container img {
+  width:100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 </style>
